@@ -17,13 +17,15 @@ If you use Visual Studio Code, the Dev Containers is very useful for developing.
 ![](https://code.visualstudio.com/assets/docs/devcontainers/create-dev-container/dev-containers-reopen.png)
 The configuration of the dev container is located in the `.devcontainer` directory.
 
-### Developing without containers
-You can also run the project in your local environment(without containers).
+### Developing with Python venv
+You can also run the project with Python venv.
 ```
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 python manage.py runserver
 ```
-However, we recommend to use docker compose.
+Make sure your Python version is 3.10 or later.
 
 ## Deployment
 Todo
