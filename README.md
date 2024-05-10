@@ -23,7 +23,7 @@ You can also run the project with Python venv.
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-python manage.py runserver
+python manage.py runserver 127.0.0.1:18000
 ```
 Make sure your Python version is 3.10 or later.
 
