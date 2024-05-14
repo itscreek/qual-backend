@@ -1,5 +1,5 @@
 services:
-  app:
+  app-prod:
     container_name: qual-backend-prod
     build:
       dockerfile: ./Dockerfile.prod
@@ -18,7 +18,7 @@ services:
       context: .
       dockerfile: ./nginx/Dockerfile.nginx
     depends_on:
-      - app
+      - app-prod
     ports:
       - "80:80"
     volumes:
