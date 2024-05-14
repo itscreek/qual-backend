@@ -1,0 +1,30 @@
+services:
+  app:
+    container_name: qual-backend-prod
+    build:
+      dockerfile: ./Dockerfile.prod
+      context: .
+    env_file:
+      - ./.env
+    volumes:
+      - type: volume
+        source: gunicorn
+        target: /tmp/gunicorn
+    command: gunicorn qual.wsgi --bind=unix:/tmp/gunicorn/gunicorn.sock
+
+  nginx:
+    container_name: nginx
+    build:
+      context: .
+      dockerfile: ./nginx/Dockerfile.nginx
+    depends_on:
+      - app
+    ports:
+      - "80:80"
+    volumes:
+      - type: volume
+        source: gunicorn
+        target: /tmp/gunicorn
+
+volumes:
+  gunicorn:
