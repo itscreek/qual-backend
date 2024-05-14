@@ -46,7 +46,7 @@ http {
         ...
 
         # Add the domain name 'www.your.domain.for.app.com'
-        server_name localhost,www.your.domain.for.app.com 
+        server_name localhost www.your.domain.for.app.com 
 
         ...
     }
