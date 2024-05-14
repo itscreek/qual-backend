@@ -28,7 +28,30 @@ python manage.py runserver 127.0.0.1:18000
 Make sure your Python version is 3.10 or later.
 
 ## Deployment
-Todo
+```
+docker compose -f docker-compose.prod.yml up
+```
+You need `.env` file for deployment. This file configures django. 
+```
+DJANGO_SECRET_KEY=secretkeyfordjango
+DJANGO_DEBUG=False
+DJANGO_ALLOWED_HOSTS=localhost,www.your.domain.for.app.com
+```
+`SECRET_KEY` is important for security and it must be private. Be careful when handling `SECRET_KEY`.
+
+You also need to configure `nginx/nginx.conf` to access the app using the server's domain name.
+```
+http {
+    server {
+        ...
+
+        # Add the domain name 'www.your.domain.for.app.com'
+        server_name localhost www.your.domain.for.app.com 
+
+        ...
+    }
+}
+```
 
 ## References
 - [Django Docs(jp)](https://docs.djangoproject.com/ja/5.0/)
