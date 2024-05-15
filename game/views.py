@@ -84,7 +84,7 @@ def problems(request):
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
                 worst_words = [word for (word, _) in sorted_preds[:NUM_RESPONSE_WORDS]]
-                return JsonResponse({"words": worst_words})
+                return JsonResponse({"words": worst_words, "sid": sid})
             else:
                 # TODO: 学習済みモデルはあるが、それを活用できていない。今は毎回再学習している
                 model = QuantumTypeTimePredictionModel(session.datas)
@@ -94,7 +94,7 @@ def problems(request):
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
                 worst_words = [word for (word, _) in sorted_preds[:NUM_RESPONSE_WORDS]]
-                return JsonResponse({"words": worst_words})
+                return JsonResponse({"words": worst_words, "sid": sid})
         else:
             raise Exception("invalid method")
     except Exception as e:
