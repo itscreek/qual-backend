@@ -30,6 +30,8 @@ class SessionManager:
         return False
     
     def get(self, sid: SessionId) -> Session:
+        if sid not in self.sessions:
+            raise Exception(f"session is not found: {sid}")
         return self.sessions[sid]
 
 smanager = SessionManager()
@@ -38,7 +40,7 @@ total_words = [''.join(random.choice(string.ascii_lowercase) for _ in range(10))
 
 def problems(request):
     # Front end must request this endpoint every NUM_RESPONSE_WORDS
-    NUM_RESPONSE_WORDS = 15
+    NUM_RESPONSE_WORDS = 2
     FIRST_NUM_RESPONSE_WORDS = NUM_RESPONSE_WORDS * 3
     """
     Send new words like below
@@ -95,5 +97,5 @@ def problems(request):
         else:
             raise Exception("invalid method")
     except Exception as e:
-        return JsonResponse({'status':'false','message': str(e)}, status=500)
+        return JsonResponse({'message': str(e)}, status=500)
     
