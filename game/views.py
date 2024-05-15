@@ -67,8 +67,8 @@ def problems(request):
                 # HACK: to kill session use this endpoint
                 smanager.kill(sid)
                 return JsonResponse({"sid": sid})
-            
-            logs: list[TypeTime] = json.loads(logs)
+
+            logs: list[TypeTime] = json.loads(logs, parse_float=float, parse_int=int)
             assert type(logs) is list and len(logs) == NUM_RESPONSE_WORDS
             session.datas += logs
             
@@ -85,6 +85,7 @@ def problems(request):
                 return JsonResponse({"words": worst_words, "sid": sid})
             else:
                 model = session.model
+                print(model)
                 model.partial_train(logs)
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
