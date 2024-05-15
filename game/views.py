@@ -5,17 +5,13 @@ from typing import Optional
 import random, string
 import json
 
-from game.domain.prediction_model import QuantumTypeTimePredictionModel
+from game.domain.prediction_model import TypeTimePredictionModel, TypeTime
 
-@dataclass
-class TypeTime:
-    word: str
-    time_ms: int
     
 @dataclass
 class Session:
     datas: list[TypeTime]
-    model: Optional[QuantumTypeTimePredictionModel]
+    model: Optional[TypeTimePredictionModel]
     
 SessionId = str
 class SessionManager:
@@ -77,19 +73,17 @@ def problems(request):
             
             if session.model is None:
                 # Train a prediction model and choice top worst words
-                model = QuantumTypeTimePredictionModel(session.datas)
+                session.model = TypeTimePredictionModel()
+                model = session.model
                 model.train()
-                session.model = model
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
                 worst_words = [word for (word, _) in sorted_preds[:NUM_RESPONSE_WORDS]]
                 return JsonResponse({"words": worst_words, "sid": sid})
             else:
-                # TODO: 学習済みモデルはあるが、それを活用できていない。今は毎回再学習している
-                model = QuantumTypeTimePredictionModel(session.datas)
-                model.train()
-                session.model = model
+                model = session.model
+                model.partial_train()
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)

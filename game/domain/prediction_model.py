@@ -7,6 +7,33 @@ from qulacs.gate import DenseMatrix
 from qulacs import ParametricQuantumCircuit
 from qulacs import Observable
 from scipy.optimize import minimize
+from dataclasses import dataclass
+
+TimeMs = float
+
+
+@dataclass
+class TypeTime:
+    word: str
+    time_ms: TimeMs
+
+
+class TypeTimePredictionModel:
+    def __init__(self):
+        pass
+
+    def train(self, typetimes: list[TypeTime]):
+        pass
+
+    def partial_train(self, typetimes: list[TypeTime]):
+        pass
+
+    def reset(self):
+        pass
+
+    def predict_times(self, words: list[str]) -> list[TimeMs]:
+        return [i * 2 for i in enumerate(words)]
+
 
 class QuantumTypeTimePredictionModel():
     """
