@@ -1,6 +1,8 @@
 from django.http import JsonResponse
 from game.models import TypingWord
 
+from game.domain.prediction_model import QuantumTypeTimePredictionModel
+
 def problems(request):
     DEFAULT_NUM_RESPONSE_WORDS = 15
     num_words_in_db = TypingWord.objects.all().count()
