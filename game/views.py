@@ -68,7 +68,7 @@ def problems(request):
                 smanager.kill(sid)
                 return JsonResponse({"sid": sid})
             
-            logs: list[TypeTime] = json.load(logs)
+            logs: list[TypeTime] = json.loads(logs)
             assert type(logs) is list and len(logs) == NUM_RESPONSE_WORDS
             session.datas += logs
             
@@ -76,15 +76,16 @@ def problems(request):
                 # Train a prediction model and choice top worst words
                 session.model = TypeTimePredictionModel()
                 model = session.model
-                model.train()
+                model.train(session.datas)
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
                 worst_words = [word for (word, _) in sorted_preds[:NUM_RESPONSE_WORDS]]
+                print(worst_words)
                 return JsonResponse({"words": worst_words, "sid": sid})
             else:
                 model = session.model
-                model.partial_train()
+                model.partial_train(logs)
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
