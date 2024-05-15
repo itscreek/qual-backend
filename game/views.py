@@ -37,6 +37,7 @@ total_words = [''.join(random.choice(string.ascii_lowercase) for _ in range(10))
     
 
 def problems(request):
+    # Front end must request this endpoint every NUM_RESPONSE_WORDS
     NUM_RESPONSE_WORDS = 15
     FIRST_NUM_RESPONSE_WORDS = NUM_RESPONSE_WORDS * 3
     """
