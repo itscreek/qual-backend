@@ -9,5 +9,4 @@ typing_extensions==4.11.0
 
 numpy
 pandas
-qulacs
 scipy
