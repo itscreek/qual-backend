@@ -1,20 +1,102 @@
 from django.http import JsonResponse
-from game.models import TypingWord
+import uuid
+from dataclasses import dataclass
+from typing import Optional
+import random, string
+import json
 
 from game.domain.prediction_model import QuantumTypeTimePredictionModel
 
-def problems(request):
-    DEFAULT_NUM_RESPONSE_WORDS = 15
-    num_words_for_response = DEFAULT_NUM_RESPONSE_WORDS
-    num_words_in_db = TypingWord.objects.all().count()
-    if num_words_in_db < num_words_for_response:
-        # TODO: サーバーが準備完了時には適当な文字列が入っていて欲しいが、今はこれで対応
-        import random, string
-        sample_words = [''.join(random.choice(string.ascii_lowercase) for _ in range(10)) for _ in range(100)]
-        for word in sample_words:
-            TypingWord(word=word).save()
+@dataclass
+class TypeTime:
+    word: str
+    time_ms: int
     
-    # Chose random words from the database
-    words_for_response = TypingWord.objects.order_by('?')[:num_words_for_response]
-    response = JsonResponse({"words": [word.word for word in words_for_response]})
-    return response
+@dataclass
+class Session:
+    datas: list[TypeTime]
+    model: Optional[QuantumTypeTimePredictionModel]
+    
+SessionId = str
+class SessionManager:
+    def __init__(self) -> None:
+        self.sessions = {}
+
+    def create(self) -> SessionId:
+        sid = str(uuid.uuid4())
+        self.sessions[sid] = Session([], None)
+        return sid
+    
+    def kill(self, sid: SessionId) -> bool:
+        if sid in self.sessions:
+            self.sessions.pop(sid)
+            return True
+        return False
+    
+    def get(self, sid: SessionId) -> Session:
+        return self.sessions[sid]
+
+smanager = SessionManager()
+total_words = [''.join(random.choice(string.ascii_lowercase) for _ in range(10)) for _ in range(100)]
+    
+
+def problems(request):
+    NUM_RESPONSE_WORDS = 15
+    FIRST_NUM_RESPONSE_WORDS = NUM_RESPONSE_WORDS * 3
+    """
+    Send new words like below
+    t=0 x====|====|====|
+    t=1 -----x----|----|====|
+    t=2 ----------x----|----|====|
+    ...
+    """
+    
+    try:
+        if request.method == "GET":
+            sid = request.GET.get('sid', 'none')
+            logs = request.GET.get('logs', 'none')
+            
+            # First sesion
+            if (sid == 'none'):
+                # Newly create session and Choose random words
+                sid = smanager.create()
+                
+                random.shuffle(total_words)
+                words_for_response = total_words[:FIRST_NUM_RESPONSE_WORDS]
+                return JsonResponse({"words": words_for_response, "sid": sid})
+            
+            session = smanager.get(sid)
+            if logs == "none":
+                # HACK: to kill session use this endpoint
+                smanager.kill(sid)
+                return JsonResponse({"sid": sid})
+            
+            logs: list[TypeTime] = json.load(logs)
+            assert type(logs) is list and len(logs) == NUM_RESPONSE_WORDS
+            session.datas += logs
+            
+            if session.model is None:
+                # Train a prediction model and choice top worst words
+                model = QuantumTypeTimePredictionModel(session.datas)
+                model.train()
+                session.model = model
+                
+                preds = list(zip(total_words, model.predict_times(total_words)))
+                sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
+                worst_words = [word for (word, _) in sorted_preds[:NUM_RESPONSE_WORDS]]
+                return JsonResponse({"words": worst_words})
+            else:
+                # TODO: 学習済みモデルはあるが、それを活用できていない。今は毎回再学習している
+                model = QuantumTypeTimePredictionModel(session.datas)
+                model.train()
+                session.model = model
+                
+                preds = list(zip(total_words, model.predict_times(total_words)))
+                sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
+                worst_words = [word for (word, _) in sorted_preds[:NUM_RESPONSE_WORDS]]
+                return JsonResponse({"words": worst_words})
+        else:
+            raise Exception("invalid method")
+    except Exception as e:
+        return JsonResponse({'status':'false','message': str(e)}, status=500)
+    
