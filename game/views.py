@@ -5,13 +5,13 @@ from typing import Optional
 import random, string
 import json
 
-from game.domain.prediction_model import TypeTimePredictionModel, TypeTime
+from game.domain.prediction_model import QuantumTypeTimePredictionModel, TypeTime
 
     
 @dataclass
 class Session:
     datas: list[TypeTime]
-    model: Optional[TypeTimePredictionModel]
+    model: Optional[QuantumTypeTimePredictionModel]
     
 SessionId = str
 class SessionManager:
@@ -73,7 +73,7 @@ def problems(request):
             
             if session.model is None:
                 # Train a prediction model and choice top worst words
-                session.model = TypeTimePredictionModel()
+                session.model = QuantumTypeTimePredictionModel()
                 model = session.model
                 model.train()
                 
