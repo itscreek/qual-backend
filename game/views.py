@@ -30,6 +30,8 @@ class SessionManager:
         return False
     
     def get(self, sid: SessionId) -> Session:
+        if sid not in self.sessions:
+            raise Exception(f"session is not found: {sid}")
         return self.sessions[sid]
 
 smanager = SessionManager()
@@ -37,6 +39,7 @@ total_words = [''.join(random.choice(string.ascii_lowercase) for _ in range(10))
     
 
 def problems(request):
+    # Front end must request this endpoint every NUM_RESPONSE_WORDS
     NUM_RESPONSE_WORDS = 15
     FIRST_NUM_RESPONSE_WORDS = NUM_RESPONSE_WORDS * 3
     """
@@ -67,15 +70,17 @@ def problems(request):
                 smanager.kill(sid)
                 return JsonResponse({"sid": sid})
             
-            logs: list[TypeTime] = json.load(logs)
-            assert type(logs) is list and len(logs) == NUM_RESPONSE_WORDS
+            logs: list[TypeTime] = json.loads(logs, parse_float=float, parse_int=int)
+            if len(logs) != NUM_RESPONSE_WORDS:
+                raise Exception(f"Invalid length of logs: {len(logs)} {logs}")
+
             session.datas += logs
             
             if session.model is None:
                 # Train a prediction model and choice top worst words
                 session.model = QuantumTypeTimePredictionModel()
                 model = session.model
-                model.train()
+                model.train(session.datas)
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
@@ -83,7 +88,7 @@ def problems(request):
                 return JsonResponse({"words": worst_words, "sid": sid})
             else:
                 model = session.model
-                model.partial_train()
+                model.partial_train(logs)
                 
                 preds = list(zip(total_words, model.predict_times(total_words)))
                 sorted_preds = sorted(preds, key=lambda x:x[1], reverse=True)
