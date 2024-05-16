@@ -26,6 +26,9 @@ class QuantumTypeTimePredictionModel:
         self.time_step = 0.79  # ランダムハミルトニアンによる時間発展の経過時間
         self.theta = None  # 学習済みパラメータを保存
 
+        self.min_val = 0.0
+        self.max_val = 3636363636 # データセットの単語の文字数によって変更
+
     def train(self, typetimes: list[TypeTime]):
         """
         モデルを初期状態から学習する
@@ -59,9 +62,6 @@ class QuantumTypeTimePredictionModel:
         return predictions
 
     def _prepare_data(self):
-        self.min_val = 0.0
-        self.max_val = 3636363636 # データセットの単語の文字数によって変更
-
         self.x_train = self._my_character_encoder(self.words)
         self.y_train = np.array(self._normalize_times(self.times))
         
