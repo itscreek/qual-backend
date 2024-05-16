@@ -6,6 +6,7 @@ import random, string
 import json
 
 from game.domain.prediction_model import TypeTimePredictionModel, TypeTime
+from game.models import TypingWord
 
     
 @dataclass
@@ -35,7 +36,8 @@ class SessionManager:
         return self.sessions[sid]
 
 smanager = SessionManager()
-total_words = [''.join(random.choice(string.ascii_lowercase) for _ in range(10)) for _ in range(100)]
+NUM_TOTAL_WORDS = 500
+total_words = [data.word for data in TypingWord.objects.order_by('?')[:NUM_TOTAL_WORDS]]
     
 
 def problems(request):
@@ -60,7 +62,6 @@ def problems(request):
                 # Newly create session and Choose random words
                 sid = smanager.create()
                 
-                random.shuffle(total_words)
                 words_for_response = total_words[:FIRST_NUM_RESPONSE_WORDS]
                 return JsonResponse({"words": words_for_response, "sid": sid})
             
