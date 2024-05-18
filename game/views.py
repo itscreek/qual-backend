@@ -37,7 +37,6 @@ class SessionManager:
 
 smanager = SessionManager()
 NUM_TOTAL_WORDS = 500
-total_words = [data.word for data in TypingWord.objects.order_by('?')[:NUM_TOTAL_WORDS]]
     
 
 def problems(request):
@@ -51,6 +50,8 @@ def problems(request):
     t=2 ----------x----|----|====|
     ...
     """
+
+    total_words = [data.word for data in TypingWord.objects.order_by('?')[:NUM_TOTAL_WORDS]]
     
     try:
         if request.method == "GET":
