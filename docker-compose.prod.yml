@@ -19,6 +19,7 @@ services:
       - app-prod
     ports:
       - "80:80"
+      - "50000:50000"
     volumes:
       - type: volume
         source: gunicorn
