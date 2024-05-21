@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   app:
     container_name: qual-backend
@@ -12,4 +10,6 @@ services:
         target: /workspace
     ports:
       - "18000:8000"
+    environment:
+      - DEVELOPMENT_MODE=True
     command: python3 manage.py runserver 0.0.0.0:8000
