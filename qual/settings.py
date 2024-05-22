@@ -130,4 +130,4 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = ['http://localhost:5173', 'https://qual-frontend.vercel.app']
+CORS_ORIGIN_WHITELIST = ['http://localhost:5173', 'https://qual-frontend.vercel.app', 'https://app.qualcloud.net']
