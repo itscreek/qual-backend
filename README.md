@@ -1,4 +1,5 @@
 # Qual Backend
+This is the API implementation for Quantum Typing App(https://app.qualcloud.net).
 
 ## Development
 Set up the server using a docker container.
@@ -54,6 +55,7 @@ http {
 ```
 
 ## References
+- [Qual Frontend](https://github.com/itscreek/qual-frontend)
 - [Django Docs(jp)](https://docs.djangoproject.com/ja/5.0/)
 - [Docker](https://www.docker.com/ja-jp/)
 - [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers)
